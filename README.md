@@ -20,9 +20,33 @@ Site: https://codekiln.github.io/workouts/
 
 The prompt includes the day's plan and what you logged last time, so copy a fresh one for each workout.
 
-## Making your own copy
+## Make your own copy
 
-Fork this repository, then in the fork's **Settings → Pages** choose **Deploy from a branch**, branch `main`, folder `/ (root)`. The site appears at `https://<your-username>.github.io/workouts/`.
+You can run your own copy of this site, with your own plan, for free on GitHub Pages. You need a GitHub account.
+
+1. **Fork the repository.** Sign in to GitHub, open [github.com/codekiln/workouts](https://github.com/codekiln/workouts), press **Fork** at the top right, then **Create fork**. You now have `github.com/<your-username>/workouts`.
+2. **Turn on GitHub Pages.** In your fork, open **Settings → Pages**. Under **Build and deployment**, set **Source** to **Deploy from a branch**, choose branch `main` and folder `/ (root)`, and press **Save**.
+3. **Open your site.** After a minute or two, the top of the Pages settings shows its address, `https://<your-username>.github.io/workouts/`. Refresh the settings page if the address isn't there yet.
+
+Each change you commit to `main` republishes the site within a couple of minutes.
+
+Your log does not carry over to your copy, because each site address keeps its own log. To bring it along, press **Export log** on the **History** tab of this site, then **Import a file…** on the same tab of yours.
+
+### Changing the plan
+
+Edit a file on GitHub by opening it, pressing the pencil icon, and then **Commit changes**. Or clone your fork and ask an AI coding assistant to make the change; the [Files](#files) section tells it where each part lives.
+
+- **The header:** "codekiln's training week" is in `index.html`.
+- **The fork badge:** the link at the top of `index.html` points to this repository. Point it to your fork if you'd like visitors to copy yours.
+- **A day's exercises:** each day in `PLAN` in `app.js` has a `title`, a `kind` (`lift`, `cardio` or `rest`), a time budget, an `intro`, `mob: true` to add the mobility circuit, and a list of `blocks`, one per exercise. A block has:
+  - `ex`: an exercise id from `EX`
+  - `alt`: ids the page offers as swaps
+  - `sets`, `unit` (`reps`, `sec`, `min` or `rounds`), and the range `min` to `max`
+  - `rest`: the rest between work sets in seconds, as `[shortest, longest]`
+  - `perSide`, `optional` and `note`, as needed
+- **A new exercise:** add an entry to `EX` with a new id, a `name`, a `kind` (`strength`, `hold`, `cardio` or `mobility`), the muscles it works in `m` (main muscles in `p`, others in `s`), and `setup`, `practice` and `cues` text. A description in `DESC` and photos in `PHOTOS` are optional. Then use the id in a block.
+- **Which weekday is Day 1:** `dayFor` and `weekStart` in `app.js` map weekdays to `D1` to `D7`, and each day's `wd` names its weekday.
+- **Quiz questions:** `QUIZ` in `app.js`. The first option in each question's `o` list is the right answer; the page shuffles them.
 
 ## Files
 

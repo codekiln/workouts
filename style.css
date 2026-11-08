@@ -11,6 +11,7 @@ img{max-width:100%}
   --green:#3d7a4a; --green-soft:#cfe5d3;  /* plate green: mobility, good */
   --yellow:#b78a12; --yellow-soft:#f3e3b0;/* plate yellow: warm-up, hold */
   --body:#c9cec6;
+  --on-accent:#ffffff;
   --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
@@ -18,13 +19,25 @@ img{max-width:100%}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#141716; --surface:#1d211f; --sunk:#262b28; --fg:#e7ebe6; --muted:#9aa49e; --line:#343a36;
   --accent:#ec6a52; --accent-soft:#5a2a22; --blue:#7fa8e0; --blue-soft:#22344d; --green:#7cc28a; --green-soft:#21392a;
-  --yellow:#e0b74a; --yellow-soft:#43381a; --body:#3b423e; color-scheme:dark}}
+  --yellow:#e0b74a; --yellow-soft:#43381a; --body:#3b423e; --on-accent:#141716; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141716; --surface:#1d211f; --sunk:#262b28; --fg:#e7ebe6; --muted:#9aa49e; --line:#343a36;
   --accent:#ec6a52; --accent-soft:#5a2a22; --blue:#7fa8e0; --blue-soft:#22344d; --green:#7cc28a; --green-soft:#21392a;
-  --yellow:#e0b74a; --yellow-soft:#43381a; --body:#3b423e; color-scheme:dark}
+  --yellow:#e0b74a; --yellow-soft:#43381a; --body:#3b423e; --on-accent:#141716; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body);margin:0}
+/* Fork me on GitHub: a small badge above the header, or a corner ribbon where the page has room beside the content */
+.forkme{display:flex;justify-content:flex-end;max-width:1080px;margin:0 auto;padding-top:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.forkme+.wrap{padding-top:10px}
+.forkme a{display:inline-block;background:var(--accent);color:var(--on-accent);font:600 .85rem/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;text-decoration:none;white-space:nowrap;padding:6px 12px;border-radius:999px}
+.forkme a:hover{filter:brightness(1.1)}
+.forkme a:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+@media (min-width:1240px){
+  .forkme{position:absolute;top:0;right:0;width:150px;height:150px;max-width:none;margin:0;padding:0;overflow:hidden;z-index:10;pointer-events:none}
+  .forkme+.wrap{padding-top:20px}
+  .forkme a{pointer-events:auto;position:absolute;top:43px;right:-52px;width:220px;height:30px;line-height:30px;padding:0;text-align:center;font-size:.95rem;border-radius:0;transform:rotate(45deg);box-shadow:0 2px 6px rgba(0,0,0,.25);outline:1px dashed color-mix(in srgb,var(--on-accent) 55%,transparent);outline-offset:-4px}
+  .forkme a:focus-visible{outline:2px solid var(--fg);outline-offset:-4px}
+}
 .wrap{max-width:1080px;margin:0 auto;padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 h1,h2,h3{font-family:var(--f-display);font-weight:600;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.1}
 h1{font-size:2.6rem;text-transform:uppercase}
