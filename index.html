@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Workouts</title>
+<meta name="description" content="A weekly training plan built from Huberman's Protocols, Chapter 2, with a set-by-set log that stays in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="lbl">Protocols, Chapter 2 · codekiln's training week</div>
+      <h1>Workouts</h1>
+      <div class="sub">Three lifting days, three cardio sessions and a short mobility circuit, with Saturday as Day 1. Use this page to <a href="#plan">learn how the plan is built</a>, <a href="#quiz">quiz yourself on it</a>, and <a href="#session">log each session</a> so you can <a href="#history">see progress over time</a>.</div>
+    </div>
+    <div class="controls">
+      <span class="field"><label class="lbl" for="date">Date</label><input type="date" id="date"></span>
+      <span class="field"><label class="lbl" for="unit">Unit</label><select id="unit"><option value="lb">lb</option><option value="kg">kg</option></select></span>
+      <span class="field"><label class="lbl" for="born" title="Used for the heart-rate targets: max heart rate ≈ 220 − age">Born</label><input type="month" id="born" placeholder="YYYY-MM" pattern="\d{4}-\d{2}" aria-describedby="born-help"></span>
+      <span id="born-help" hidden>Year and month you were born, used to work out heart-rate targets.</span>
+    </div>
+  </header>
+  <div class="status" id="status" role="status">Loading your log…</div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-today" aria-selected="true" data-view="today">Session</button>
+    <button role="tab" id="tab-mobility" aria-selected="false" data-view="mobility">Mobility circuit</button>
+    <button role="tab" id="tab-plan" aria-selected="false" data-view="plan">How the plan works</button>
+    <button role="tab" id="tab-quiz" aria-selected="false" data-view="quiz">Quiz</button>
+    <button role="tab" id="tab-history" aria-selected="false" data-view="history">History</button>
+    <button role="tab" id="tab-rules" aria-selected="false" data-view="rules">Rules from the book</button>
+    <button role="tab" id="tab-terms" aria-selected="false" data-view="terms">Terms</button>
+  </nav>
+
+  <div id="view"></div>
+  <div id="gloss" role="tooltip" hidden></div>
+  <div id="restbar" hidden>
+    <div class="rb-in">
+      <span class="rb-name" id="rb-name"></span>
+      <span class="rb-time num" id="rb-time" aria-live="off">0:00</span>
+      <span class="rb-state" id="rb-state" role="status"></span>
+      <span class="rb-track" aria-hidden="true"><span id="rb-fill"></span><span id="rb-lo"></span><span id="rb-hi"></span></span>
+      <button type="button" class="btn" id="rb-stop">Stop</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>Sources: codekiln's plan pages <a href="https://codekiln.github.io/logseq-encode-garden/My/Exercise/Body/Plan/" class="mono">My/Exercise/Body/Plan</a> and exercise pages in the logseq-encode-garden; Huberman, <i>Protocols</i> (2026), Exercise Protocols 1–4, read on Kindle pp. 160–202. Photos: Wikimedia Commons, licences in each caption. Demonstration links open YouTube or the source site.</p>
+    <p>Your log is saved in this browser only. To back it up or move it to another device, use Export and Import on the <a href="#history">History</a> tab. The page's source is at <a href="https://github.com/codekiln/workouts">github.com/codekiln/workouts</a>.</p>
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
