@@ -2,7 +2,8 @@
    The log is one JSON object in localStorage under "wk.log.v1":
    {sessions:{"YYYY-MM-DD":{…}}, quiz:{…}, quiznotes:{…}, srs:{…}, srslog:{…}, settings:{main:{…}}}
    db.collection(name).onSnapshot(cb) and db.doc("collection/id").onSnapshot(cb) call cb now and after every change,
-   including changes made in another tab; doc.set(v) replaces a document; doc.update(v) merges into one that exists. */
+   including changes made in another tab; doc.set(v) replaces a document; doc.update(v) merges into one that exists.
+   Published sessions (wkLog.setPublished) show for every date this browser has no session of its own; they are never saved here. */
 (function(){
 "use strict";
 const KEY="wk.log.v1";
@@ -11,11 +12,13 @@ const copy=v=>v==null?v:JSON.parse(JSON.stringify(v));
 const later=f=>setTimeout(f,0); // snapshots arrive after the write that caused them
 const subs=new Map(); // "sessions" or "settings/main" -> listeners
 let data=null;
+let published={}; // date -> session document from the published log
 
 function read(){try{const v=JSON.parse(localStorage.getItem(KEY)||"{}");return v&&typeof v==="object"?v:{}}catch(e){return {}}}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(data))}
   catch(e){const err=new Error("browser storage is full or blocked");err.code="storage";throw err}}
 function coll(c){return data[c]||(data[c]={})}
+function view(c){return c==="sessions"?Object.assign({},published,data.sessions||{}):(data[c]||{})}
 function split(path){const i=String(path).indexOf("/");
   if(i<1||i===path.length-1)throw new Error("expected collection/id, got "+path);return [path.slice(0,i),path.slice(i+1)]}
 function emit(keys){later(()=>keys.forEach(k=>{const s=subs.get(k);if(s)s.forEach(f=>f())}))}
@@ -27,13 +30,14 @@ function write(c,id,next){const had=Object.prototype.hasOwnProperty.call(coll(c)
 
 const db={
   collection:c=>({onSnapshot:(cb,onErr)=>listen(c,()=>{
-    try{cb({docs:Object.keys(data[c]||{}).map(id=>({id,data:()=>copy(data[c][id])}))})}catch(e){if(onErr)onErr(e);else throw e}})}),
+    const all=view(c);
+    try{cb({docs:Object.keys(all).map(id=>({id,data:()=>copy(all[id])}))})}catch(e){if(onErr)onErr(e);else throw e}})}),
   doc:path=>{const [c,id]=split(path);return {
     set:async v=>write(c,id,copy(v)),
     update:async v=>{const cur=(data[c]||{})[id];
       if(cur==null){const err=new Error("no document at "+path);err.code="not-found";throw err}
       write(c,id,Object.assign(copy(cur),copy(v)))},
-    onSnapshot:(cb,onErr)=>listen(path,()=>{const v=(data[c]||{})[id];
+    onSnapshot:(cb,onErr)=>listen(path,()=>{const v=view(c)[id];
       try{cb({exists:v!=null,data:()=>copy(v)})}catch(e){if(onErr)onErr(e);else throw e}})}}
 };
 function openDB(){
@@ -64,6 +68,10 @@ window.wkLog={
     const st=r&&r.settings&&r.settings.main;
     if(st&&typeof st==="object")coll("settings").main=Object.assign(coll("settings").main||{},copy(st));
     persist();emit([...subs.keys()]);return n},
-  isEmpty(){openDB();return !Object.keys(data.sessions||{}).length}
+  isEmpty(){openDB();return !Object.keys(data.sessions||{}).length},
+  setPublished(sessions){openDB();published={};
+    for(const [d,doc] of Object.entries(sessions||{}))if(/^\d{4}-\d{2}-\d{2}$/.test(d)&&doc&&typeof doc==="object")published[d]=copy(doc);
+    emit([...subs.keys()]);return Object.keys(published).length},
+  publishedOnly(){openDB();return Object.keys(published).filter(d=>!(data.sessions||{})[d]).length}
 };
 })();

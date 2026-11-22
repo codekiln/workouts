@@ -10,6 +10,7 @@ Site: https://codekiln.github.io/workouts/
 - Fill in load, reps and reps in reserve as you go. Entries save automatically.
 - Set **Born** (year and month) at the top of the page to see heart-rate targets on the cardio days.
 - The log is saved in the browser you use and is not sent anywhere. Clearing the browser's site data erases it. Use **Export log** on the **History** tab to keep a backup or to move the log to another device, and **Import a file…** on the same tab to load it there.
+- The page also shows codekiln's published log, from `data/log.json`, on every date your browser has no session of its own.
 
 ## Coaching by voice
 
@@ -32,6 +33,8 @@ Each change you commit to `main` republishes the site within a couple of minutes
 
 Your log does not carry over to your copy, because each site address keeps its own log. To bring it along, press **Export log** on the **History** tab of this site, then **Import a file…** on the same tab of yours.
 
+Your copy shows codekiln's published log until you replace or delete `data/log.json`. To show no published log, delete the file, or set `PUBLISHED_LOG` in `static.js` to `""`.
+
 ### Changing the plan
 
 Edit a file on GitHub by opening it, pressing the pencil icon, and then **Commit changes**. Or clone your fork and ask an AI coding assistant to make the change; the [Files](#files) section tells it where each part lives.
@@ -51,7 +54,7 @@ Edit a file on GitHub by opening it, pressing the pencil icon, and then **Commit
 
 ## Files
 
-`index.html`, `style.css` and `app.js` are made from codekiln's Workouts artifact on claude.ai by `tools/sync_from_artifact.py`. In a fork, edit them directly.
+`index.html`, `style.css` and `app.js` are made from codekiln's Workouts artifact on claude.ai by `tools/sync_from_artifact.py`, and `data/log.json` from the artifact's log by `tools/publish_log.py`. In a fork, edit them directly.
 
 - `index.html`: the page layout
 - `style.css`: styles, with light and dark themes
@@ -66,12 +69,14 @@ Edit a file on GitHub by opening it, pressing the pencil icon, and then **Commit
   - `MUS`: the muscles view; `GLOSS`: the terms
   - `QUIZ`: quiz questions; `FSRS_W`: the spaced-repetition settings for **Review**
   - `voicePrompt`: the voice-coaching prompt
-- `shim.js`: the log, kept in the browser's `localStorage` under the key `wk.log.v1`. It provides the `window.claude` database and downloads that `app.js` uses on claude.ai, and the export and import.
-- `static.js`: what differs from the artifact: video chapters open YouTube at their start time, the **Born** field, **Export log** and **Import a file…** on the **History** tab, and `PUBLISHED_LOG`, empty, which can name a log file in this repository to load in browsers that have no log yet. It starts the page.
+- `shim.js`: the log, kept in the browser's `localStorage` under the key `wk.log.v1`. It provides the `window.claude` database and downloads that `app.js` uses on claude.ai, and the export and import. Sessions from the published log show for dates the browser has no session of its own; they aren't saved in the browser or exported.
+- `static.js`: what differs from the artifact: video chapters open YouTube at their start time, the **Born** field, **Export log** and **Import a file…** on the **History** tab, and `PUBLISHED_LOG`, the published log's path, loaded on every visit. It starts the page.
+- `data/log.json`: the published log, a `workouts-log` file with sessions only
 - `static.css`: styles for the fork badge, the **Born** field and the video chapter links
 - `img/`: exercise photos from Wikimedia Commons; each photo's author and licence are in its caption on the page
 - `tools/sync_from_artifact.py`: rebuilds `index.html`, `style.css` and `app.js` from the artifact. Save the artifact's HTML to a file, then run `python3 -I tools/sync_from_artifact.py path/to/artifact.html` from the repository root. It stops without writing anything when the artifact has changed in a way it can't convert, and names the part.
 - `tools/photos.json`: which file in `img/` holds each Wikimedia Commons photo the artifact uses. A photo missing from it is left off the page, with a warning from the script.
+- `tools/publish_log.py`: rebuilds `data/log.json` from the artifact's log. Save each of the artifact's `sessions/YYYY-MM-DD` documents to a folder as `YYYY-MM-DD.json`, then run `python3 -I tools/publish_log.py path/to/folder` from the repository root. It writes sessions only, without the exercise in progress or a running rest timer, and leaves out birth year and month.
 
 ## Log format
 

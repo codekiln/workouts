@@ -1,8 +1,9 @@
 /* The static site's own parts, for what the claude.ai artifact gets from claude.ai: video chapters, the Born field,
-   and Export log / Import a file… on the History tab. Loaded after shim.js and app.js; the last lines start the page. */
+   Export log / Import a file… on the History tab, and the published log. Loaded after shim.js and app.js; the last lines start the page. */
 
-/* Path of a workouts-log file in this repository to load into a browser that has no log yet, such as "log.json". Empty: none. */
-const PUBLISHED_LOG="";
+/* The published log, a workouts-log file written by tools/publish_log.py. Every visit shows its sessions for the dates
+   this browser has no session of its own. Empty, or a missing file: none. */
+const PUBLISHED_LOG="data/log.json";
 
 /* ---------- video chapters: each chapter opens Huberman's video on YouTube at its start ---------- */
 /* app.js keeps the artifact's chapter list; tools/sync_from_artifact.py points each chapter's c at YouTube and calls this where the artifact has a <video> */
@@ -32,9 +33,11 @@ async function wkWatchSettings(){let db=null;try{db=await window.claude.use("db"
 let wkDataMsg="";
 const wkRenderHistory=renderHistory;
 renderHistory=function(){wkRenderHistory();if(state.db)$("#view").insertAdjacentHTML("beforeend",wkDataPanel())};
-function wkDataPanel(){const n=Object.keys(state.sessions||{}).length;
+const wkPlural=(n,w)=>`${n} ${w}${n===1?"":"s"}`;
+function wkCount(){return Object.keys(wkLog.exportAll().sessions).length+wkLog.publishedOnly()}
+function wkDataPanel(){const n=Object.keys(wkLog.exportAll().sessions).length,m=wkLog.publishedOnly();
   return `<section class="panel"><h3>Your data</h3>
-   <p class="muted" style="margin:4px 0 10px">The log is saved in this browser only: ${n} session${n===1?"":"s"} so far. Export it to keep a backup or to move it to another device or browser, then import the file there. Importing replaces any date that is in the file and keeps the rest. A voice session report can be imported here too.</p>
+   <p class="muted" style="margin:4px 0 10px">The log is saved in this browser only: ${wkPlural(n,"session")} so far. Export it to keep a backup or to move it to another device or browser, then import the file there. Importing replaces any date that is in the file and keeps the rest. A voice session report can be imported here too.${m?` The page also shows ${wkPlural(m,"session")} from the site's published log. They aren't in the export, and a session you log here for one of those dates takes its place.`:""}</p>
    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn primary" data-log="export">Export log</button><button type="button" class="btn" data-log="import">Import a file…</button><input type="file" id="importfile" accept=".json,application/json,text/plain" hidden><span class="muted" role="status">${esc(wkDataMsg)}</span></div></section>`}
 function wkImport(txt){
   let r;try{const a=txt.indexOf("{"),z=txt.lastIndexOf("}");r=JSON.parse(txt.slice(a,z+1))}catch(e){return "Couldn't read that file as JSON."}
@@ -42,8 +45,7 @@ function wkImport(txt){
   if(!r||r.type!=="workouts-log")return "That file isn't a log export or a voice session report.";
   if(!state.db)return "The log isn't available in this browser, so nothing was imported.";
   flushNow();
-  try{const n=wkLog.importAll(r),all=Object.keys(wkLog.exportAll().sessions).length;
-    setStatus(`${all} session${all===1?"":"s"} in the log`);
+  try{const n=wkLog.importAll(r);setStatus(`${wkPlural(wkCount(),"session")} in the log`);
     return `Imported ${n.sessions} session${n.sessions===1?"":"s"}.`}
   catch(e){return "Couldn't save the import ("+(e.code||e.message||"error")+")."}
 }
@@ -57,9 +59,12 @@ document.addEventListener("click",async ev=>{const t=ev.target.closest("[data-lo
 document.addEventListener("change",async ev=>{if(ev.target.id!=="importfile")return;const f=ev.target.files&&ev.target.files[0];if(!f)return;
   let txt="";try{txt=await f.text()}catch(e){}
   wkDataMsg=wkImport(txt);ev.target.value="";render()});
-async function wkLoadPublished(){
-  try{if(!PUBLISHED_LOG||!wkLog.isEmpty())return;
-    const r=await (await fetch(PUBLISHED_LOG,{cache:"no-cache"})).json();if(r&&r.type==="workouts-log")wkLog.importAll(r)}catch(e){}}
+async function wkLoadPublished(){if(!PUBLISHED_LOG)return;
+  let r=null;try{const res=await fetch(PUBLISHED_LOG,{cache:"no-cache"});if(res.ok)r=await res.json()}catch(e){}
+  if(!r||r.type!=="workouts-log")return;
+  try{wkLog.setPublished(r.sessions)}catch(e){return} // no storage: the page shows no log at all
+  const st=$("#status").textContent;
+  if(/^Log connected|in the log$|^Connecting/.test(st))setStatus(`${wkPlural(wkCount(),"session")} in the log`)}
 
 /* ---------- start ---------- */
 wkWatchSettings();
