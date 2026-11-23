@@ -84,6 +84,18 @@ nav.tabs button[aria-selected=true]{color:var(--fg);border-bottom-color:var(--ac
 .sheet.closed .chev{transform:rotate(-45deg);margin-bottom:0}
 .sheet .shchips{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
 .sheet .shbody{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr)}
+/* focus view: one exercise, only what's needed to do it */
+.focusv{touch-action:pan-y}
+.focusv .fnav{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg,var(--surface));padding:8px 0}
+.focusv .fnav .btn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-height:44px}
+.focusv .fnav .btn:last-child{text-align:right}
+.focusv .fnav .btn[disabled]{visibility:hidden}
+.focusv .fpos{display:flex;flex-direction:column;align-items:center;text-align:center}
+.focusv .sheet{margin-top:4px}
+.focusv .sheet .shbody{grid-template-columns:minmax(0,1fr)}
+.focusv .media,.focusv details.exdet,.focusv .desc,.focusv .aka,.focusv .eqtags,.focusv .mgroups,.focusv .sheet .chev{display:none}
+.focusv .sheet .tog{pointer-events:none}
+.focusv .fhint{font-size:.78rem;text-align:center;margin-top:12px}
 .mgroups{display:flex;flex-wrap:wrap;gap:4px;flex-basis:100%}
 .mg{font-size:.75rem;padding:1px 7px;border-radius:999px;white-space:nowrap}
 .mg.p{background:var(--accent-soft);color:var(--fg);font-weight:500}
